@@ -10,6 +10,7 @@ import CreditsPage from './pages/CreditsPage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
 import AdminUsersPage from './pages/AdminUsersPage';
 import AdminPaymentsPage from './pages/AdminPaymentsPage';
+import AdminEnvironmentPage from './pages/AdminEnvironmentPage';
 import Footer from './components/Footer';
 
 const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -51,6 +52,7 @@ function App() {
                   <Route index element={<Navigate to="users" />} />
                   <Route path="users" element={<AdminUsersPage />} />
                   <Route path="payments" element={<AdminPaymentsPage />} />
+                  <Route path="environments" element={<AdminEnvironmentPage />} />
                 </Route>
 
                  <Route path="*" element={<Navigate to="/" />} />

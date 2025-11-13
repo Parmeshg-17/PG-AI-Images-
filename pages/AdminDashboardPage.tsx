@@ -30,6 +30,7 @@ const AdminDashboardPage = () => {
                 <NavLink to="payments" className={navLinkClasses}>
                     Manage Payments {pendingPayments > 0 && <span className="ml-2 bg-yellow-500 text-black text-xs font-bold px-2 py-1 rounded-full">{pendingPayments}</span>}
                 </NavLink>
+                <NavLink to="environments" className={navLinkClasses}>Environments</NavLink>
             </div>
 
             <div className="bg-light-secondary dark:bg-dark-secondary p-6 rounded-xl shadow-inner border border-light-border dark:border-dark-border">
