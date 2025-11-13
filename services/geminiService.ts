@@ -3,7 +3,11 @@
 import { GoogleGenAI } from "@google/genai";
 
 export const generateImage = async (prompt: string, count: number): Promise<string[]> => {
-  // Initialize the AI client here to prevent app crash on load if API key is missing.
+  // Proactively check for the API key to provide a clear error.
+  if (!process.env.API_KEY) {
+    throw new Error("An API Key must be set when running in a browser");
+  }
+  
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
   try {
@@ -29,8 +33,8 @@ export const generateImage = async (prompt: string, count: number): Promise<stri
   } catch (error) {
     console.error("Error generating image:", error);
     if (error instanceof Error) {
-        if (error.message.toLowerCase().includes('api key')) {
-            throw new Error('The AI service is not configured. Please contact support.');
+        if (error.message.includes('API Key')) {
+            throw new Error('An API Key must be set when running in a browser');
         }
         throw new Error(`Failed to generate image: ${error.message}`);
     }

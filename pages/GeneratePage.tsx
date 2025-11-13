@@ -1,16 +1,23 @@
 
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { generateImage } from '../services/geminiService';
 
 const GeneratePage: React.FC = () => {
-  const [prompt, setPrompt] = useState('');
+  const [prompt, setPrompt] = useState('A photo of a young Korean woman sitting on marble stairs. She is wearing a white dress.');
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [numberOfImages, setNumberOfImages] = useState(1);
   const { user, updateCredits } = useAuth();
+
+  useEffect(() => {
+    // Check for API Key on component mount to provide immediate feedback.
+    if (!process.env.API_KEY) {
+      setError('An API Key must be set when running in a browser');
+    }
+  }, []);
 
   const isUnlimited = user && user.credits >= 99999;
   const generationCost = numberOfImages;
@@ -23,7 +30,7 @@ const GeneratePage: React.FC = () => {
     }
 
     if (!hasEnoughCredits) {
-      setError(`You need ${generationCost} credits to generate ${generationCost} images.`);
+      setError(`You need ${generationCost} credits to generate ${generationCost} ${generationCost > 1 ? 'images' : 'image'}.`);
       return;
     }
 
@@ -64,10 +71,10 @@ const GeneratePage: React.FC = () => {
     <button
       onClick={() => setNumberOfImages(num)}
       disabled={isLoading}
-      className={`w-10 h-10 flex items-center justify-center rounded-lg font-bold text-sm transition-colors ${
+      className={`w-12 h-10 flex items-center justify-center rounded-lg font-bold text-sm transition-all ${
         numberOfImages === num
-          ? 'bg-accent-dark text-accent dark:bg-accent dark:text-accent-dark'
-          : 'bg-light dark:bg-dark border border-light-border dark:border-dark-border hover:bg-gray-200 dark:hover:bg-gray-800'
+          ? 'bg-accent dark:bg-accent text-accent-dark'
+          : 'bg-dark text-dark-text hover:bg-dark-secondary'
       }`}
     >
       {num}
@@ -89,17 +96,20 @@ const GeneratePage: React.FC = () => {
             type="text"
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
-            placeholder="e.g., A majestic lion wearing a crown, photorealistic"
+            placeholder="A photo of a young Korean woman sitting on marble stairs..."
             className="flex-grow w-full px-4 py-3 rounded-lg bg-light dark:bg-dark border border-light-border dark:border-dark-border focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-colors"
             disabled={isLoading}
           />
           <button
             onClick={handleGenerate}
-            disabled={isLoading || !prompt.trim() || !hasEnoughCredits}
+            disabled={isLoading || !prompt.trim() || !hasEnoughCredits || !!error}
             className="w-full md:w-auto bg-accent-dark text-accent dark:bg-accent dark:text-accent-dark px-6 py-3 rounded-lg font-bold hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd" /></svg>
-            {isLoading ? 'Generating...' : `Generate (${generationCost} C)`}
+             <div className="flex flex-col items-center leading-tight">
+                <span>{isLoading ? 'Generating...' : 'Generate'}</span>
+                <span className="text-xs opacity-80">({generationCost} C)</span>
+             </div>
           </button>
         </div>
         
@@ -112,7 +122,7 @@ const GeneratePage: React.FC = () => {
             </div>
         </div>
 
-        {error && <p className="text-red-500 text-center mb-4">{error}</p>}
+        {error && <p className="text-red-500 text-center mb-4 font-semibold">{error}</p>}
 
         <div className="w-full min-h-[32rem] bg-light dark:bg-dark rounded-lg flex items-center justify-center border border-light-border dark:border-dark-border overflow-hidden p-2 md:p-4">
           {isLoading && (
